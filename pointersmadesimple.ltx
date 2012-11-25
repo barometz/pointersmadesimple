@@ -62,12 +62,14 @@
 	is doing is still immensely relevant.
 
 	\paragraph{Purpose of this document}
+
 	Pointers are a tremendously important topic in  lower-level languages, but
 	they can also be a big hurdle for a lot of people. Students, teachers and
 	professionals alike can find them very confusing, and even those who use
-	them daily often struggle to explain the details clearly. I will try to
-	explain things from scratch, pointing out and circumnavigating potential
-	pitfalls on the way.
+	them daily may struggle to explain some things clearly. It's not even very
+	complicated: words just tend to get in the way. I will try to explain
+	things from scratch, pointing out and circumnavigating potential pitfalls
+	on the way.
 
 	This article assumes that you're using the C programming language, as
 	that's where you're most likely to run into these things. A lot of time is
@@ -156,29 +158,32 @@
 		``pointer to an integer''.
 
 		\item[Indirection operator {\it or} dereference operator] Two names
-		for the same thing. The variable {\tt num} is declared as a pointer
-		to an integer, which means that the value of {\tt num} is an address.
-		But we don't care about addresses, we want integers! The dereference
+		for the same thing. The variable {\tt num} is declared as a pointer to
+		an integer, which means that the value of {\tt num} is an address. But
+		we don't care about addresses, we want integers! The dereference
 		operator \emph{dereferences} a pointer: it gets you access to the
-		variable at the address contained by the pointer; the variable the
-		pointer points at. In lines 2 and 3 that's what {\tt *} does: it
-		gives you access to read and modify the value at the address stored
-		in {\tt num}.
+		variable at the address contained by the pointer; access to the
+		variable the pointer points at. In lines 2 and 3 that's what {\tt *}
+		does: it gives you access to read and modify the value at the address
+		stored in {\tt num}.
+
 	\end{description}
 	It's possible that much of the confusion about pointers stems from this
 	difference: these two meanings of the asterisk are very similar yet so
-	very different, and very few texts spend any time to explain it.
+	very different, and few texts spend any time making this explicit.
 
 	The important thing to remember is that in {\tt int * num} -- be it a
 	function argument or a variable declaration -- the asterisk is part of
-	{\tt num}'s variable type {\tt int *},\marginpar{{\tt num} is of type {\tt
-	int *}} while in {\tt *num = 0} it dereferences the pointer {\tt num}.
+	{\tt num}'s variable type, {\tt int *},
+	\marginpar{{\tt num} is of type {\tt int *}} 
+	while in {\tt *num = 0} it dereferences the pointer {\tt num}.
 
 	From a different perspective: in the argument list it doesn't even make
 	sense to think of it as a dereference operator. The dereference operator
 	makes an integer out of a pointer to an integer -- {\tt num} is a pointer
-	to int, {\tt *num} is an integer.\marginpar{{\tt *num} is of type {\tt
-	int}} \lstinline{clear_if_large(int * num)} is a function that takes one
+	to int, {\tt *num} is an integer.
+	\marginpar{{\tt *num} is of type {\tt int}} 
+	{\tt clear\_if\_large(int * num)} is a function that takes one
 	argument of type {\tt int *}, and {\tt *num} has nothing to do with that.
 
 	\paragraph{Optional reading ahead}
@@ -193,12 +198,12 @@
 	If the asterisk fully tied to the char you'd expect this to result in
 	three variables of type {\tt char *}, so three pointers to {\tt char}. In
 	reality, this code will leave you with one pointer to {\tt char} and two
-	bog-standard {\tt char}s. If you want to get three pointers it becomes:
+	bog-standard {\tt char}s. If you want three pointers it becomes:
 	\begin{lstlisting}[numbers=none]
 		char * one, * two, * three;
 	\end{lstlisting}
 
-	\emph{``The C Programming Language''}\cite[p.~94]{kandr} describes 
+	\emph{The C Programming Language}\cite[p.~94]{kandr} describes 
 	the declaration syntax as ``a mnemonic [that] mimics the syntax of
 	expressions in which the variable might appear''. This is a little strange
 	as {\tt int * foo} can be assigned an address, while {\tt *foo} can only
@@ -215,6 +220,8 @@
 	Pointers are variables, so they can be created the same way as other
 	variables. Let's try it out:
 	\begin{lstlisting}[caption=Creating a pointer]
+		#include <stdio.h>
+		
 		void main() {
 			int * foo;  // Create a variable "foo" of type "int *"
 			*foo = 4;   // Assign 4 to the address it points at
@@ -238,6 +245,8 @@
 	store: getting the address of an existing variable, or allocating new
 	space in memory. The former looks like this:
 	\begin{lstlisting}[caption=Pointing a pointer]
+		#include <stdio.h>
+		
 		void main() {
 			int bar = 45;
 			int * foo;   // Create a variable "foo" of type "int *"
@@ -250,27 +259,28 @@
 		dominic@nienna:~/coding> ./a.out 
 		45
 	\end{verbatim}
-	Much better! But what happened? This snippet introduces a new operator:
-	the \emph{address-of operator}\marginpar{address-of operator} {\tt \&}. As
-	mentioned before, a pointer is really just a variable that contains the
-	address of another variable. This operator allows you to get the address
-	of another variable and stick it into a pointer. In this particular case
-	it takes the address of {\tt bar} and stores it in {\tt foo}. As with
-	other variables, you don't have to split declaration (``this variable
-	exists'') and assignment (``its value is..'') over two lines:
+	Much better, but what happened? This snippet introduces a new operator:
+	the \emph{address-of operator} {\tt \&}. As mentioned before, a pointer is
+	really just a variable that contains the address of another variable. This
+	operator allows you to get the address of another variable and stick it
+	into a pointer. In this particular case it takes the address of {\tt bar}
+	and stores it in {\tt foo}. As with other variables, you don't have to
+	split declaration (``this variable exists'') and assignment (``its value
+	is..'') over two lines:
 	\begin{lstlisting}[caption={Pointing a pointer, short version}]
+		#include <stdio.h>
+		
 		void main() {
 			int bar = 45;
 			int * foo = &bar; 
 			printf("%d\n", *foo);
 		}
 	\end{lstlisting}
-	See the difference? It's a small one, combining the declaration and
-	assignment of {\tt foo} into one line. What's confusing here is that it
-	might just look like you're assigning {\tt \&bar} to an integer called
-	{\tt *foo}. That is not the case! The longer version assigned {\tt \&bar}
-	to {\tt foo}, not to {\tt *foo}. It's the same here: {\tt \&bar} is
-	assigned to {\tt foo}, which happens to be a variable of type {\tt int *}.
+	See the difference? What may confuse here is that it might look like
+	you're assigning {\tt \&bar} to an integer called {\tt *foo}. That is not
+	the case! The longer version assigned {\tt \&bar} to {\tt foo}, not to
+	{\tt *foo}. It's the same here: {\tt \&bar} is assigned to {\tt foo},
+	which happens to be a variable of type {\tt int *}.
 
 \subsubsection{Pointing to the heap}
 	As mentioned in the introduction, normally declared variables (e.g. {\tt
@@ -282,19 +292,23 @@
 	or doing a lot of recursive calls.
 
 	The heap, on the other hand, might be described as ``the rest of the
-	available memory''. The heap is another section of memory available to the
-	program that can grow and shrink as needed, giving you access to as much
-	memory as the operating system will allow. To get data on the heap you
-	have to explicitly allocate space. When you're done with the allocated
-	space you should deallocate it, otherwise it won't be available until your
-	program has finished running -- more on that in \autoref{sec:cleanup}.
-	\begin{lstlisting}[caption={How to allocate heap memory}]
+	memory''. The heap is another section of memory available to the program
+	that can grow and shrink as needed, giving you access to as much memory as
+	the operating system will allow. To get data on the heap you have to
+	explicitly allocate space. When you're done with the allocated space you
+	should deallocate it, otherwise it won't be available until your program
+	has finished running -- more on that in \autoref{sec:cleanup}.
+	\begin{lstlisting}[caption=Allocating heap memory]
+		#include <stdio.h>
+		#include <stdlib.h>
+		
 		void main() {
 			int * heapptr = malloc(sizeof(int));
 			*heapptr = 42;
 			printf("%d\n", *heapptr);
 		}
 	\end{lstlisting}
+	
 	When you want a pointer to the heap there's no other variable to get the
 	address of, so you'll have to ask the system to make some room for you.
 	The standard library {\tt <stdlib.h>} defines -- among many others -- the
@@ -302,12 +316,12 @@
 	some available space of the specified size.  You may not have seen the
 	type {\tt size\_t} before, but don't worry: it's just an integer type of a
 	size that's appropriate for the system you're compiling for. Usually
-	you'll get an appropriate {\tt size} argument by using the {\tt sizeof}
-	operator, which can be applied to variables (integers, chars, but also
-	structures) as well as to literal type identifiers ({\tt int}, {\tt long})
-	and yields the size of the type in bytes.
+	you'll get a {\tt size} argument by using the {\tt sizeof} operator, which
+	can be applied to variables (integers, chars, but also structures) as well
+	as to literal type identifiers ({\tt int}, {\tt long}) and yields the size
+	of the type in bytes.
 
-	Space allocated with {\tt malloc()} is never initialized. Unless you put
+	Space allocated with {\tt malloc} is never initialized. Unless you put
 	something there the value will be whatever happened to be at that memory
 	location, which is usually not very useful. There's another library
 	function {\tt void * calloc(size\_t nobj, size\_t size)} that allocates
@@ -315,11 +329,11 @@
 	space to zero bytes.
 
 	\paragraph{Potential errors}
-	But what happens when {\tt malloc} can't find enough space in memory?
-	Rest assured: nothing catches fire, and \emph{trying} to allocate too much
-	memory doesn't make anything crash either. What does make things crash
-	(remember the {\tt Segmentation fault}) is trying to use memory that isn't
-	available to you. When {\tt malloc} and {\tt calloc} can't find enough
+	But what happens when {\tt malloc} can't find enough space in memory? Rest
+	assured: nothing catches fire, and \emph{trying} to allocate too much
+	memory doesn't make anything crash either. What does make things crash is
+	trying to use memory that isn't available to you -- remember the {\tt
+	Segmentation fault}. When {\tt malloc} or {\tt calloc} can't find enough
 	space to fulfill your request they return {\tt NULL}, which is why it's
 	always a good idea to check for that before trying to use the results of a
 	memory allocation.
@@ -338,7 +352,9 @@
 	would look like. The function asks for one pointer to an integer, or {\tt
 	int *}.
 	\paragraph{Ready?} Here are three slightly different ways to go about it.
-	\begin{lstlisting}[caption={Providing pointer arguments, take 1}]
+	\begin{lstlisting}[caption={Providing pointer arguments, take 1}, label=lst:context1]
+		#include <stdio.h>
+		
 		void main() {
 			int highnum = 286;        // Create an ordinary integer
 			clear_if_large(&highnum); // Pass its address
@@ -346,6 +362,8 @@
 		}
 	\end{lstlisting}
 	\begin{lstlisting}[caption={Providing pointer arguments, take 2}]
+		#include <stdio.h>
+		
 		void main() {
 			int highnum = 286;        // Create an ordinary integer
 			int * highptr = &highnum; // Create a pointer to it
@@ -354,6 +372,9 @@
 		}
 	\end{lstlisting}
 	\begin{lstlisting}[caption={Providing pointer arguments, take 3}]
+		#include <stdio.h>
+		#include <stdlib.h>
+		
 		void main() {
 			int * highptr = malloc(sizeof(int)); // Create a pointer, allocate space
 			*highptr = 286;          // Fill the space with data
@@ -362,25 +383,24 @@
 		}
 	\end{lstlisting}
 
-	Three different ways to pass a pointer to a function, and they're really
+	Three different ways to pass a pointer to a function, but they're really
 	all the same: in the end, every single one of them passes the function the
-	address of some memory space that contains an integer. In the first one,
-	the address is derived from another variable, in the other two the address
-	is stored in a pointer.
+	address of some memory space that contains an integer. In the first and
+	second, the address is derived from another variable, in the second and
+	third the address is stored in a pointer.
 
 	Pay close attention to how {\tt *} is used in all three cases as well as
 	how it's not used. Remember: our function takes a pointer-to-int, while
-	{\tt printf} takes an integer in this case.
+	{\tt printf} needs an integer for {\tt \%d}.
 
 \subsection{Cleaning up}\label{sec:cleanup}
 	When you allocate memory on the heap, that memory is marked as unavailable
 	to anything else until it's deallocated. There are two ways to deallocate
 	memory: by ending the program that's using it, or by explicitly telling
 	the system that you're not going to need it anymore. A lot of things that
-	only run for a few seconds or minutes can rely on the allocated memory
-	being released when they're finished, but if a program stays on for a
-	while or uses a lot of memory it's a good idea to keep track of what you
-	do and don't need anymore.
+	only run for a few seconds or minutes can rely on the former, but if a
+	program stays on for a while or uses a lot of memory it's a good idea to
+	keep track of what you do and don't need anymore.
 
 	Freeing memory is easy: {\tt <stdlib.h>} provides a function {\tt void
 	free(void *ptr)} that you can pass a pointer to previously allocated
@@ -389,6 +409,8 @@
 	can't just pass it any address in a block of allocated space, and you
 	can't free stack memory. So what does it look like?
 	\begin{lstlisting}[caption=Cleaning up heap memory, label=lst:freeing]
+		#include <stdlib.h>
+		
 		void main() {
 			int * lots = malloc(4000 * sizeof(int));
 			/* do things with all that space */
@@ -406,7 +428,7 @@
 	Notice the {\tt NULL} assignment in line 5? It's not necessary, but it's
 	frequently considered good practice to set pointers that don't go anywhere
 	useful right now to {\tt NULL} so you're less likely to try and access
-	garbage memory. Additionally, {\tt free()} does nothing when presented
+	garbage memory. Additionally, {\tt free} does nothing when presented
 	with a {\tt NULL} pointer, so this way it doesn't matter if you
 	accidentally try and free the pointer's target twice.
 
@@ -436,20 +458,20 @@
 	make sense? And since a pointer is just a variable, can you in fact have a
 	pointer to a pointer? Sure!
 
-	Nothing of this is going to be \emph{hard}. Much of it however is a little
-	more complex than previous sections, but it can still be explained with
+	Nothing of this is going to be \emph{hard}. Much of it is a little more
+	complex than previous sections, but it can still be explained with
 	everything you already know.
 
 \subsection{Variable-size arrays}
 	This one's pretty essential.  Up until the C99 standard you had to specify
 	the size of arrays at compiletime, meaning that you couldn't base it on a
-	function argument or any other runtime information.  C99 allows for this,
+	function argument or any other runtime information. C99 allows for this,
 	but the other solution -- that you'll still see plenty of -- is to
 	allocate a block of space with pointers and {\tt malloc}.
 	\begin{lstlisting}[caption=Using pointers for variable-size arrays]
 		#include <stdio.h>
 		#include <stdlib.h>
-
+		
 		void main() {
 			int * thelist = calloc(4000, sizeof(int));
 			int i;
@@ -482,6 +504,7 @@
 	reading from there until it encounters a nullbyte \verb|'\0'|.
 	\begin{lstlisting}[caption=Character arrays]
 		#include <stdio.h>
+		
 		void main() {
 			char * onestring = "Hi there!";
 			printf("%s \n", onestring);
@@ -522,13 +545,24 @@
 			printf("foo  at %u, value %d\n", &foo, foo);
 		}
 	\end{lstlisting}
+	Compile, run:
+	\begin{verbatim}
+		dominic@nienna:~/coding/pointersimple> ./a.out 
+		quux at 3219582196, value 3219582200
+		bar  at 3219582200, value 3219582204
+		foo  at 3219582204, value 23
+	\end{verbatim}
+	Your results will most likely be very different, but the pattern is the
+	same: the value of {\tt quux} is the address of {\tt bar}, and the value
+	of {\tt bar} is the address of {\tt foo}.
+
 	The notation is the same as always - a pointer to {\tt type} looks like
-	{\tt type * foo}, so a pointer to {\tt int *} becomes {\tt int * *} which
-	is typically written as {\tt int **}. If it helps, you can substitute
-	another name for {\tt int *}:
+	{\tt type * foo}, so a pointer to {\tt int *} becomes {\tt int * * foo}
+	which is typically written as {\tt int ** foo}. If it helps, you can
+	substitute another name for {\tt int *}:
 	\begin{lstlisting}[caption={Pointers to pointers, substituted}]
 		void main() {
-			typedef int * intptr; // Define inptr to mean "int *"
+			typedef int * intptr; // Define intptr to mean "int *"
 			int foo = 23;
 			intptr bar = &foo;    
 			intptr * quux = &bar; // A pointer to intptr is really just "int **"
@@ -555,13 +589,13 @@
 	\end{lstlisting}
 	In {\tt make\_string}, {\tt out} is a variable of type {\tt char **}. That
 	means that {\tt **out} is a {\tt char}, and {\tt *out} is a {\tt char *}.
-	Because it's passed the address of a pointer, it can change the address
-	stored \emph{in} that pointer. Again, if this doesn't immediately make
-	sense, replace {\tt char *} with another name:
+	Because {\tt make\_string} receives the address of a pointer, it can
+	change the address stored \emph{in} that pointer. Again, if this doesn't
+	immediately make sense, replace {\tt char *} with another name:
 	\begin{lstlisting}[caption={Passing the address of a pointer, substituted}]
 		#include <stdio.h>
 
-		typedef char * string;
+		typedef char * string;  // Define string to mean "char *"
 
 		void make_string(string * out) {
 			string ret = "Here's a string!";
@@ -575,14 +609,15 @@
 			printf("%s\n", onestring);
 		}
 	\end{lstlisting}
+
 	And now it looks just like you're passing any other variable -- because
-	that's all it is!  Compare this to the example in \autoref{sec:context}
-	where a pointer to {\tt int} was passed.
+	that's all it is!  Compare this to \autoref{lst:context1} in
+	\autoref*{sec:context} where a pointer to {\tt int} was passed.
 
 \subsection{Function pointers}
 	Pointers don't only point to data: they can also point to functions. In C,
-	this is the main way to pass functions around as arguments. A typical
-	example of why this is useful is the {\tt qsort} function (defined in {\tt
+	this is the main way to pass functions around as arguments. A good example
+	of why this is useful is the {\tt qsort} function (defined in {\tt
 	<stdlib.h>}), which has the following signature:
 	\begin{lstlisting}[numbers=none]
 		void qsort(void * base, size_t n, size_t size, 
@@ -597,12 +632,12 @@
 \newpage{}
 \section{Tidbits}
 \subsection{About}
-	I first thought of writing this article after trying to explain an
-	assignment to a classmate. I'd breezed through the assignment myself, but
-	while I could \emph{use} pointers and related concepts it turned out I
-	didn't grok\footnote{to grok, v.: To fully and completely understand
-	something in all its details and intricacies.
-	[\url{http://en.wiktionary.org/wiki/grok}]} it yet. Writing it out like
+	I first thought of writing this article after trying (and failing) to
+	explain an assignment to a classmate. I'd breezed through the assignment
+	myself, but while I could \emph{use} pointers and related concepts it
+	turned out I didn't grok\footnote{to grok, v.: To fully and completely
+	understand something in all its details and intricacies --
+	\url{http://en.wiktionary.org/wiki/grok}} it yet. Writing it out like
 	this would be an opportunity to clear up my own misconceptions and mental
 	blocks. It did take a lecturer getting confused by his own explanation for
 	me to actually start writing.
@@ -611,16 +646,17 @@
 	challenges with the subject matter, but I hope that it can be helpful for
 	any who are new to or confused by programming with pointers.
 
-	The most recent version of this document is available at 
+	The most recent version of this document is available at:
+
 	\url{https://github.com/barometz/pointersmadesimple}.
 
 	\paragraph{We Value Your Input}
-	If there's something wrong with the article, be it a factual error, an
-	omission or a spelling mistake, please contact me. I wrote this to learn
-	as much as to teach, and teaching without learning is a dead end anyway.
-	If there's something right with the article, please contact me
-	immediately. Send your threats and love letters to
-	\href{mailto:dominic@baudvine.net}{<dominic@baudvine.net>}.
+	If you have a suggestion or think there's something wrong with the
+	article, be it a factual error, an omission or a spelling mistake, please
+	contact me. I wrote this to learn as much as to teach, and teaching
+	without learning is a dead end anyway. If there's something right with the
+	article, please contact me immediately. Send your threats and love letters
+	to \href{mailto:dominic@baudvine.net}{<dominic@baudvine.net>}.
 
 	\paragraph{Further reading}
 	By now, \emph{The C Programming Language}\cite{kandr} (often referred to
